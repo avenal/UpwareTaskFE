@@ -1,25 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import React, { useEffect } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { ListContainer } from "components/ListContainer";
+import { useDispatch, useSelector } from "react-redux";
+import { addNewElement, fetchElementList } from "store/elements";
+import { AppState } from 'store/rootReducer';
+import { Form } from "components/Form"
 function App() {
+  const dispatch = useDispatch();
+  const {elements, isPending} = useSelector((state: AppState) => state.elementList)
+  const handleClick = () => {
+
+    dispatch(addNewElement({date_from: '2020-01-20', date_to: '2020-01-20', date_time: '2020-01-20 15:23', tag: 1, tags: [{id:1}, {id: 2}]}));
+  }
+  useEffect(() => {
+    dispatch(fetchElementList());
+  }, [dispatch]);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {!isPending && <ListContainer data={elements} />}
     </div>
+
   );
 }
 
