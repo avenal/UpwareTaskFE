@@ -4,11 +4,11 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { addDays, format, toDate } from "date-fns";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewElement } from "store/elements";
+import { addNewElement, updateElement, fetchElementList } from "store/elements";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 import { DateRange } from "react-date-range";
-import { Input, Form as StyledForm } from "./styles";
+import { Input, Form } from "./styles";
 import { Select } from "components/Select";
 import { AppState } from "store/rootReducer";
 import DateTimePicker from "react-datetime-picker";
@@ -24,18 +24,17 @@ const validationSchema = yup.object().shape({
   consent: yup.bool().oneOf([true, false], "Pole wymagane"),
   tag: yup.number(),
   tags: yup.array().of(yup.number()),
-  // tags: yup.string(),
 });
 
-const Form: FC<any> = ({handleClose}: any) => {
+const EditForm: FC<any> = ({ object, handleClose }: any) => {
   const [state, setState] = useState<any>([
     {
-      startDate: new Date(),
-      endDate: addDays(new Date(), 7),
+      startDate: new Date(object.date_from),
+      endDate: new Date(object.date_to),
       key: "selection",
     },
   ]);
-  const [datetime, setDatetime] = useState(new Date());
+  const [datetime, setDatetime] = useState(new Date(object.date_time));
   const formRef = useRef(null);
 
   const dispatch = useDispatch();
@@ -63,36 +62,37 @@ const Form: FC<any> = ({handleClose}: any) => {
     submitForm,
   } = useFormik({
     initialValues: {
-      date_from: state[0].startDate,
-      date_to: state[0].endDate,
-      date_time: datetime,
-      currency_name: "",
-      currency_value: "",
-      consent: false,
-      tag: "",
-      tags: [],
+      date_from: new Date(object.date_from),
+      date_to: new Date(object.date_to),
+      date_time: new Date(object.date_time),
+      currency_name: object.currency_name,
+      currency_value: object.currency_value,
+      consent: object.consent,
+      tag: object.tag ? object.tag.id : "",
+      tags: object && object.tags ? object.tags.map((i: any) => i.id) : [],
     },
+    enableReinitialize: true,
     validateOnChange: false,
     validationSchema,
     onSubmit(values: any, { resetForm }) {
       const data = {
         ...values,
+        id: object.id,
         date_from: format(values.date_from, "yyyy-MM-dd"),
         date_to: format(values.date_to, "yyyy-MM-dd"),
         date_time: format(values.date_time, "yyyy-MM-dd HH:mm:ss"),
-        consent: values.consent ? 1:0,
+        consent: values.consent ? 1 : 0,
         tags: values.tags.map((item: any) => {
           return { id: item };
         }),
       };
-
-      dispatch(addNewElement(data));
+      dispatch(updateElement(data));
       handleClose();
     },
   });
   return (
     <>
-      <StyledForm ref={formRef} onSubmit={handleSubmit}>
+      <Form ref={formRef} onSubmit={handleSubmit}>
         <DateRange
           onChange={(item: any) => {
             setState([item.selection]);
@@ -104,13 +104,13 @@ const Form: FC<any> = ({handleClose}: any) => {
           editableDateInputs={true}
         />
         <DateTimePicker
-          className={"datepicker"}
           onChange={(value: Date) => {
             setDatetime(value);
             setFieldValue("date_time", value);
           }}
           value={datetime}
         />
+
         <Select
           options={currencies}
           valueFrom={"tag"}
@@ -129,6 +129,7 @@ const Form: FC<any> = ({handleClose}: any) => {
           max="1000000000"
           step="0.1"
         />
+
         <Select
           options={tags}
           valueFrom={"id"}
@@ -145,7 +146,7 @@ const Form: FC<any> = ({handleClose}: any) => {
           handleClick={(val: number) => handleMultiSelect(val)}
           multiple={true}
         />
-         <Checkbox
+        <Checkbox
           value={values.consent}
           handleClick={(value: boolean) => setFieldValue("consent", value)}
         >
@@ -160,9 +161,9 @@ const Form: FC<any> = ({handleClose}: any) => {
         >
           Wyslij
         </Submit>
-      </StyledForm>
+      </Form>
     </>
   );
 };
 
-export { Form };
+export { EditForm };

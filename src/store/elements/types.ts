@@ -1,3 +1,5 @@
+import { Tag } from "store/tags"
+
 export interface Element {
     readonly id: number;
     readonly date_from: Date;
@@ -15,7 +17,3 @@ export interface ElementListState {
     readonly isPending: boolean;
 }
 
-export interface Tag {
-    readonly id: number;
-    readonly title: string;
-}
