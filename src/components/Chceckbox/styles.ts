@@ -39,7 +39,9 @@ export const Box = styled.div<Checked>`
 `;
 
 export const Label = styled.span`
-  font-size: 12px;
+  font-size: 16px;
   padding-left: 20px;
   color: ${({ theme }) => theme.colors.black};
+  display: flex;
+  align-items: center;
 `;

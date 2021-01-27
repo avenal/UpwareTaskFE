@@ -12,6 +12,10 @@ code {
     monospace;
 }
 
+.react-datetime-picker__wrapper {
+  border-radius: 6px;
+}
+
 .datepicker {
   z-index: 3;
 }

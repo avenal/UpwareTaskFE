@@ -5,10 +5,21 @@ import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
 import { addNewTag } from "store/tags";
 import { Input, Form } from "./styles";
-import { Submit } from "components/Buttons"
+import { Submit } from "components/Buttons";
+import {
+  ErrorMessage,
+  ErrorWrapper,
+  InputWrapper,
+  Label,
+  SubmitWrapper,
+} from "./styles";
 
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Pole wymagane"),
+  title: yup
+    .string()
+    .required("Pole wymagane")
+    .min(2, "This field must be 2-20 characters")
+    .max(20, "This field must be 2-20 characters"),
 });
 
 const AddTagForm: FC<any> = () => {
@@ -26,34 +37,40 @@ const AddTagForm: FC<any> = () => {
     submitForm,
   } = useFormik({
     initialValues: {
-      title:"",
+      title: "",
     },
     enableReinitialize: true,
-    validateOnChange: false,
     validationSchema,
     onSubmit(values: any, { resetForm }) {
       dispatch(addNewTag(values));
+      resetForm();
     },
   });
   return (
     <>
       <Form ref={formRef} onSubmit={handleSubmit}>
-        <Input
-          name={"title"}
-          value={values.title}
-          onChange={handleChange}
-          placeholder="title"
-        />
-
-        {/* {errors.name ? <p>{errors.name}</p> : null} */}
-        <Submit
-          onClick={(e) => {
-            submitForm();
-            e.preventDefault();
-          }}
-        >
-          Wyslij
-        </Submit>
+        <InputWrapper>
+          <Label>Title</Label>
+          <Input
+            name={"title"}
+            value={values.title}
+            onChange={handleChange}
+            placeholder="title"
+          />
+          <ErrorWrapper>
+            {errors.title ? <ErrorMessage>{errors.title}</ErrorMessage> : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <SubmitWrapper>
+          <Submit
+            onClick={(e) => {
+              submitForm();
+              e.preventDefault();
+            }}
+          >
+            Submit
+          </Submit>
+        </SubmitWrapper>
       </Form>
     </>
   );

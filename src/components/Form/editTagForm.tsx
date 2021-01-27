@@ -5,11 +5,22 @@ import { useFormik } from "formik";
 import { useDispatch } from "react-redux";
 import { updateTag } from "store/tags";
 import { Input, Form } from "./styles";
-import { Submit } from "components/Buttons"
+import { Submit } from "components/Buttons";
+import {
+  ErrorMessage,
+  ErrorWrapper,
+  InputWrapper,
+  Label,
+  SubmitWrapper,
+} from "./styles";
 
 const validationSchema = yup.object().shape({
-  title: yup.string().required("Pole wymagane"),
-  id: yup.number().required()
+  title: yup
+    .string()
+    .required("Field required")
+    .min(2, "This field must be 2-20 characters")
+    .max(20, "This field must be 2-20 characters"),
+  id: yup.number().required(),
 });
 
 const EditTagForm: FC<any> = ({ object, handleClose }: any) => {
@@ -31,32 +42,38 @@ const EditTagForm: FC<any> = ({ object, handleClose }: any) => {
       title: object.title,
     },
     enableReinitialize: true,
-    validateOnChange: false,
     validationSchema,
     onSubmit(values: any, { resetForm }) {
       dispatch(updateTag(values));
+      resetForm();
       handleClose();
     },
   });
   return (
     <>
       <Form ref={formRef} onSubmit={handleSubmit}>
-        <Input
-          name={"title"}
-          value={values.title}
-          onChange={handleChange}
-          placeholder="title"
-        />
-
-        {/* {errors.name ? <p>{errors.name}</p> : null} */}
-        <Submit
-          onClick={(e) => {
-            submitForm();
-            e.preventDefault();
-          }}
-        >
-          Wyslij
-        </Submit>
+        <InputWrapper>
+          <Label>Title</Label>
+          <Input
+            name={"title"}
+            value={values.title}
+            onChange={handleChange}
+            placeholder="title"
+          />
+          <ErrorWrapper>
+            {errors.title ? <ErrorMessage>{errors.title}</ErrorMessage> : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <SubmitWrapper>
+          <Submit
+            onClick={(e) => {
+              submitForm();
+              e.preventDefault();
+            }}
+          >
+            Submit
+          </Submit>
+        </SubmitWrapper>
       </Form>
     </>
   );

@@ -13,26 +13,39 @@ import { Select } from "components/Select";
 import { AppState } from "store/rootReducer";
 import DateTimePicker from "react-datetime-picker";
 import { Checkbox } from "components/Chceckbox";
-import { Submit } from "components/Buttons"
+import { Submit } from "components/Buttons";
+import {
+  ErrorMessage,
+  ErrorWrapper,
+  InputWrapper,
+  Label,
+  SubmitWrapper,
+} from "./styles";
 
 const validationSchema = yup.object().shape({
-  date_from: yup.date().required("Pole wymagane"),
-  date_to: yup.string().required("Pole wymagane").min(1, "Pole wymagane"),
-  date_time: yup.string(),
-  currency_name: yup.string(),
-  currency_value: yup.number(),
-  consent: yup.bool().oneOf([true, false], "Pole wymagane"),
-  tag: yup.number(),
+  date_from: yup.date().required("Field required"),
+  date_to: yup.date().required("Field required"),
+  date_time: yup.string().required("Field required"),
+  currency_name: yup
+    .string()
+    .required("Field required")
+    .min(1, "Field required"),
+  currency_value: yup
+    .number()
+    .min(0, "Minimum value must be equal or greater than 0")
+    .max(10000000000),
+  consent: yup.bool().oneOf([true, false], "Field required"),
+  tag: yup.number().required("Field required"),
   tags: yup.array().of(yup.number()),
-  // tags: yup.string(),
 });
 
-const Form: FC<any> = ({handleClose}: any) => {
+const Form: FC<any> = ({ handleClose }: any) => {
   const [state, setState] = useState<any>([
     {
       startDate: new Date(),
       endDate: addDays(new Date(), 7),
       key: "selection",
+      color: "#0A2472",
     },
   ]);
   const [datetime, setDatetime] = useState(new Date());
@@ -80,7 +93,7 @@ const Form: FC<any> = ({handleClose}: any) => {
         date_from: format(values.date_from, "yyyy-MM-dd"),
         date_to: format(values.date_to, "yyyy-MM-dd"),
         date_time: format(values.date_time, "yyyy-MM-dd HH:mm:ss"),
-        consent: values.consent ? 1:0,
+        consent: values.consent ? 1 : 0,
         tags: values.tags.map((item: any) => {
           return { id: item };
         }),
@@ -93,73 +106,129 @@ const Form: FC<any> = ({handleClose}: any) => {
   return (
     <>
       <StyledForm ref={formRef} onSubmit={handleSubmit}>
-        <DateRange
-          onChange={(item: any) => {
-            setState([item.selection]);
-            setFieldValue("date_from", item.selection.startDate);
-            setFieldValue("date_to", item.selection.endDate);
-          }}
-          moveRangeOnFirstSelection={false}
-          ranges={state}
-          editableDateInputs={true}
-        />
-        <DateTimePicker
-          className={"datepicker"}
-          onChange={(value: Date) => {
-            setDatetime(value);
-            setFieldValue("date_time", value);
-          }}
-          value={datetime}
-        />
-        <Select
-          options={currencies}
-          valueFrom={"tag"}
-          show={"name"}
-          value={values.currency_name}
-          handleClick={(val: string) => setFieldValue("currency_name", val)}
-          multiple={false}
-        />
-        <Input
-          name={"currency_value"}
-          value={values.currency_value}
-          onChange={handleChange}
-          placeholder="Value"
-          type="number"
-          min="0"
-          max="1000000000"
-          step="0.1"
-        />
-        <Select
-          options={tags}
-          valueFrom={"id"}
-          show={"title"}
-          value={values.tag}
-          handleClick={(val: string) => setFieldValue("tag", val)}
-          multiple={false}
-        />
-        <Select
-          options={tags}
-          valueFrom={"id"}
-          show={"title"}
-          value={values.tags}
-          handleClick={(val: number) => handleMultiSelect(val)}
-          multiple={true}
-        />
-         <Checkbox
-          value={values.consent}
-          handleClick={(value: boolean) => setFieldValue("consent", value)}
-        >
-          I agree
-        </Checkbox>
-        {/* {errors.name ? <p>{errors.name}</p> : null} */}
-        <Submit
-          onClick={(e) => {
-            submitForm();
-            e.preventDefault();
-          }}
-        >
-          Wyslij
-        </Submit>
+        <InputWrapper>
+          <Label>Date range</Label>
+          <DateRange
+            onChange={(item: any) => {
+              setState([item.selection]);
+              setFieldValue("date_from", item.selection.startDate);
+              setFieldValue("date_to", item.selection.endDate);
+            }}
+            moveRangeOnFirstSelection={false}
+            ranges={state}
+            editableDateInputs={true}
+          />
+          <ErrorWrapper>
+            {errors.date_from ? (
+              <ErrorMessage>{errors.date_from}</ErrorMessage>
+            ) : null}
+            {errors.date_to ? (
+              <ErrorMessage>{errors.date_to}</ErrorMessage>
+            ) : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Datetime</Label>
+          <DateTimePicker
+            className={"datepicker"}
+            onChange={(value: Date) => {
+              setDatetime(value);
+              setFieldValue("date_time", value);
+            }}
+            value={datetime}
+          />
+          <ErrorWrapper>
+            {errors.date_time ? (
+              <ErrorMessage>{errors.date_time}</ErrorMessage>
+            ) : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Currency</Label>
+          <Select
+            options={currencies}
+            valueFrom={"tag"}
+            show={"display"}
+            value={values.currency_name}
+            handleClick={(val: string) => setFieldValue("currency_name", val)}
+            multiple={false}
+          />
+          <ErrorWrapper>
+            {errors.currency_name ? (
+              <ErrorMessage>{errors.currency_name}</ErrorMessage>
+            ) : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Value</Label>
+          <Input
+            name={"currency_value"}
+            value={values.currency_value}
+            onChange={handleChange}
+            placeholder="Value"
+            type="number"
+            min="0"
+            max="1000000000"
+            step="0.1"
+          />
+          <ErrorWrapper>
+            {errors.currency_value ? (
+              <ErrorMessage>{errors.currency_value}</ErrorMessage>
+            ) : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Tag (from database)</Label>
+          <Select
+            options={tags}
+            valueFrom={"id"}
+            show={"title"}
+            value={values.tag}
+            handleClick={(val: string) => setFieldValue("tag", val)}
+            multiple={false}
+          />
+          <ErrorWrapper>
+            {errors.tag ? <ErrorMessage>{errors.tag}</ErrorMessage> : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Tags (multiple choice)</Label>
+          <Select
+            options={tags}
+            valueFrom={"id"}
+            show={"title"}
+            value={values.tags}
+            handleClick={(val: number) => handleMultiSelect(val)}
+            multiple={true}
+          />
+          <ErrorWrapper>
+            {errors.tags ? <ErrorMessage>{errors.tags}</ErrorMessage> : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <InputWrapper>
+          <Label>Checkbox</Label>
+          <Checkbox
+            value={values.consent}
+            handleClick={(value: boolean) => setFieldValue("consent", value)}
+          >
+            I agree
+          </Checkbox>
+          <ErrorWrapper>
+            {errors.consent ? (
+              <ErrorMessage>{errors.consent}</ErrorMessage>
+            ) : null}
+          </ErrorWrapper>
+        </InputWrapper>
+        <SubmitWrapper>
+          <Submit
+            onClick={(e) => {
+              submitForm();
+              e.preventDefault();
+            }}
+          >
+            Submit
+          </Submit>
+        </SubmitWrapper>
       </StyledForm>
     </>
   );

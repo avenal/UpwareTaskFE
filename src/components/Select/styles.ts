@@ -1,10 +1,10 @@
 import styled from "styled-components";
 
 interface OpenProps {
-    open?: boolean;
+  open?: boolean;
 }
 interface Checked {
-  checked?:boolean;
+  checked?: boolean;
 }
 
 export const Wrapper = styled.div`
@@ -12,8 +12,6 @@ export const Wrapper = styled.div`
   display: block;
   position: relative;
   width: 100%;
-  min-height: 40px;
-  color: #35495e;
 `;
 
 export const Arrow = styled.div<OpenProps>`
@@ -33,12 +31,14 @@ export const Arrow = styled.div<OpenProps>`
 export const Label = styled.div<OpenProps>`
   border: 1px solid
     ${(props) =>
-      props.open ? props.theme.colors.primary : props.theme.colors.input_border};
-  padding: 7px 6px;
-  border-radius: 5px;
+    props.open ? props.theme.colors.primary : props.theme.colors.input_border};
+    padding: 6px 8px;
+
+  border-radius: 10px;
   font-size: 14px;
-  color: ${(props) => props.theme.colors.placeholder};
+  color: ${(props) => props.theme.colors.black};
   font-weight: 400;
+  text-align: left;
   cursor: pointer;
 `;
 
@@ -61,11 +61,11 @@ export const Options = styled.ul`
 export const Option = styled.li<Checked>`
   padding: 12px 6px;
   cursor: pointer;
-  color: ${(props) => props.theme.colors.placeholder};
-  font-size: 16px;
-  background: ${(props) => props.checked ? props.theme.colors.primary : props.theme.colors.white };
+  color: ${(props) => props.checked ? props.theme.colors.white : props.theme.colors.black};
+  font-size: 14px;
+  background: ${(props) => props.checked ? props.theme.colors.primary : props.theme.colors.white};
   &:hover {
     background: ${(props) => props.theme.colors.primary};
-    color: ${(props) => props.theme.colors.black};
+    color: ${(props) => props.theme.colors.white};
   }
 `;

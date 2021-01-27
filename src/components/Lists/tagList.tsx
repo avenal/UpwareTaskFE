@@ -2,11 +2,11 @@ import React, { useState, FC } from "react";
 import { useSelector } from "react-redux";
 import { AppState } from "store/rootReducer";
 import { EditTagForm } from "components/Form";
-import { List, ListElement } from "./styles";
+import { BtnMargin, List, TagListElement, ButtonsWrapper } from "./styles";
 import { useDispatch } from "react-redux";
 import { Modal } from "components/Modal";
 import { deleteTag } from "store/tags";
-import { Submit } from "components/Buttons"
+import { Submit } from "components/Buttons";
 
 export const TagList: FC<any> = () => {
   const { tags, isPending } = useSelector((state: AppState) => state.tagList);
@@ -25,20 +25,27 @@ export const TagList: FC<any> = () => {
       {!isPending ? (
         <>
           <List>
+            <TagListElement className={"header"}>
+              <div>Id</div>
+              <div>Title</div>
+              <div>Actions</div>
+            </TagListElement>
             {tags.map((item: any, index: number) => {
               return (
-                <ListElement key={`${item.id}-${index}`}>
-                  <div>{item.id ? item.id : "id"}</div>
-                  <div>{item.title ? item.title : "null title"}</div>
-                  <div>
-                    <Submit
-                      onClick={() => {
-                        setObj(item);
-                        setEditModalOpen(true);
-                      }}
-                    >
-                      Edit
-                    </Submit>
+                <TagListElement key={`${item.id}-${index}`}>
+                  <div>{item.id ? item.id : "null"}</div>
+                  <div>{item.title ? item.title : "null"}</div>
+                  <ButtonsWrapper>
+                    <BtnMargin>
+                      <Submit
+                        onClick={() => {
+                          setObj(item);
+                          setEditModalOpen(true);
+                        }}
+                      >
+                        Edit
+                      </Submit>
+                    </BtnMargin>
                     <Submit
                       onClick={() => {
                         setDeleteItemId(item.id);
@@ -47,31 +54,35 @@ export const TagList: FC<any> = () => {
                     >
                       Delete
                     </Submit>
-                  </div>
-                </ListElement>
+                  </ButtonsWrapper>
+                </TagListElement>
               );
             })}
           </List>
           {deleteModalOpen && (
             <Modal handleClose={() => setDeleteModalOpen(false)}>
-              <p>Are u sure?</p>
-              <Submit
-                onClick={() => {
-                  handleDelete(deleteItemId);
-                  setDeleteModalOpen(false);
-                  setDeleteItemId(null);
-                }}
-              >
-                Yes
-              </Submit>
-              <Submit
-                onClick={() => {
-                  setDeleteModalOpen(false);
-                  setDeleteItemId(null);
-                }}
-              >
-                No
-              </Submit>
+              <p>Are you sure?</p>
+              <ButtonsWrapper>
+                <BtnMargin>
+                  <Submit
+                    onClick={() => {
+                      handleDelete(deleteItemId);
+                      setDeleteModalOpen(false);
+                      setDeleteItemId(null);
+                    }}
+                  >
+                    Yes
+                  </Submit>
+                </BtnMargin>
+                <Submit
+                  onClick={() => {
+                    setDeleteModalOpen(false);
+                    setDeleteItemId(null);
+                  }}
+                >
+                  No
+                </Submit>
+              </ButtonsWrapper>
             </Modal>
           )}
           {editModalOpen && obj && (

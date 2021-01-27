@@ -2,7 +2,7 @@ import { Dispatch } from 'redux';
 
 import { client } from 'shared/utils';
 import { URLS } from 'shared/consts';
-// import { alert, Variant } from 'store/alert';
+import { alert, Variant } from 'store/alerts';
 import {
     getElementListStart,
     getElementListSuccess,
@@ -38,9 +38,9 @@ export const updateElement = (element: Element) => async (dispatch: Dispatch<any
         await client.put(`${URLS.api}${URLS.elements}/${element.id}`, data);
         dispatch(fetchElementList());
         dispatch(updateElementSuccess());
-        // dispatch(alert(SUCCESS.updateBook, Variant.success));
+        dispatch(alert('The element has been successfully updated', Variant.success));
     } catch (err) {
-        // dispatch(alert(ERRORS.updateBook, Variant.error));
+        dispatch(alert('Error while updating the element', Variant.error));
         dispatch(updateElementError());
     }
 };
@@ -50,10 +50,10 @@ export const deleteElement = (id: number) => async (dispatch: Dispatch<any>) => 
 
     try {
         await client.delete(`${URLS.api}${URLS.elements}/${id}`);
-        // dispatch(alert(SUCCESS.deleteBook, Variant.success));
+        dispatch(alert('The element has been successfully deleted', Variant.success));
         dispatch(deleteElementSuccess(id));
     } catch (err) {
-        // dispatch(alert(ERRORS.deleteBook, Variant.error));
+        dispatch(alert('Error while deleting the element', Variant.error));
         dispatch(deleteElementError());
     }
 };
@@ -64,9 +64,9 @@ export const addNewElement = (newElement: Record<string, any>) => async (dispatc
     try {
         const { data } = await client.post(`${URLS.api}${URLS.elements}`, newElement);
         dispatch(addElementSuccess(data));
-        // dispatch(alert(SUCCESS.addBook, Variant.success));
+        dispatch(alert('The element has been added successfully', Variant.success));
     } catch (err) {
-        // dispatch(alert(ERRORS.addBook, Variant.error));
+        dispatch(alert('Error while adding the element', Variant.error));
         dispatch(addElementError());
     }
 };

@@ -1,22 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
-import { ElementList, TagList } from "components/Lists";
-import { useDispatch, useSelector } from "react-redux";
-import { addNewElement, fetchElementList } from "store/elements";
-import { AppState } from "store/rootReducer";
+import { useDispatch } from "react-redux";
+import { fetchElementList } from "store/elements";
 import { fetchCurrencyList } from "store/currencies";
 import { fetchTagList } from "store/tags";
-import { AddTagForm, Form } from "components/Form";
-import { Submit } from "components/Buttons"
-import { Modal } from "components/Modal";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import { ElementPage, TagPage } from "pages"
+import { Alert } from "components/Alert"
+import styled from "styled-components"
+
+const StyledUl = styled.ul`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 16px 0;
+`
+const StyledLink = styled(Link)`
+  color: ${p=>p.theme.colors.primary};
+  font-size: 16px;
+  font-weight: 700;
+  &.mr {
+    margin-right: 16px;
+  }
+`
 
 function App() {
   const dispatch = useDispatch();
-  const tagsLoading = useSelector((state: AppState) => state.tagList.isPending);
-  const currenciesLoading = useSelector(
-    (state: AppState) => state.currencyList.isPending
-  );
-  const [openAddModal, setOpenAddModal] = useState(false);
+
   useEffect(() => {
     dispatch(fetchElementList());
     dispatch(fetchCurrencyList());
@@ -24,19 +39,29 @@ function App() {
   }, [dispatch]);
   return (
     <div className="App">
-      <ElementList />
-      <TagList />
-      <AddTagForm />
-      {!tagsLoading && !currenciesLoading && (
-        <>
-          <Submit onClick={() => setOpenAddModal(true)}>Add element</Submit>
-        </>
-      )}
-      {openAddModal && (
-        <Modal handleClose={() => setOpenAddModal(false)}>
-          <Form handleClose={() => setOpenAddModal(false)} />
-        </Modal>
-      )}
+       <Router>
+      <div>
+        <nav>
+          <StyledUl>
+            <li>
+              <StyledLink className={"mr"} to="/">Tags</StyledLink>
+            </li>
+            <li>
+              <StyledLink to="/elements">Elements</StyledLink>
+            </li>
+          </StyledUl>
+        </nav>
+        <Alert />
+        <Switch>
+          <Route path="/elements">
+            <ElementPage />
+          </Route>
+          <Route path="/">
+            <TagPage />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
     </div>
   );
 }
